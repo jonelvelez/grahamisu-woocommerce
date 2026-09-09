@@ -1,0 +1,13 @@
+{
+  "name": "grahamisu",
+  "version": "1.0.0",
+  "description": "Grahamisu WooCommerce theme",
+  "scripts": {
+    "build": "tailwindcss -i ./assets/css/input.css -o ./assets/css/main.css --minify",
+    "watch": "tailwindcss -i ./assets/css/input.css -o ./assets/css/main.css --watch"
+  },
+  "devDependencies": {
+    "tailwindcss": "^4.0.0",
+    "@tailwindcss/cli": "^4.0.0"
+  }
+}

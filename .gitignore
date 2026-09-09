@@ -1,0 +1,26 @@
+# WordPress sensitive files
+wp-config.php
+wp-config-sample copy.php
+
+# Uploads directory (user content, not tracked)
+wp-content/uploads/
+
+# WordPress cache
+wp-content/cache/
+
+# WP Rocket cache
+wp-content/cache/wp-rocket/
+
+# Logs
+*.log
+wp-content/debug.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Node
+node_modules/
+
+# Build artifacts (keep compiled main.css since no CI)
+# wp-content/themes/grahamisu/assets/css/main.css

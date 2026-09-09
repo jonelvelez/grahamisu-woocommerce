@@ -1,0 +1,569 @@
+@import "tailwindcss";
+
+/* ── Scan WordPress theme templates ── */
+@source "../../..";
+
+/* ── Brand theme tokens ── */
+@theme {
+    --color-bg:      #fdf2ec;
+    --color-brown:   #61453a;
+    --color-gold:    #c8a56a;
+    --color-body:    #000000;
+    --color-white:   #ffffff;
+    --color-dark:    #371613;
+    --color-rust:    #6c290f;
+    --color-surface: #f1eff0;
+    --color-muted:   #676565;
+
+    --font-primary:  'Playfair Display', serif;
+    --font-script:   'Kaushan Script', cursive;
+
+    --transition-base: 0.25s ease;
+}
+
+/* ── Base overrides ── */
+@layer base {
+    html {
+        scroll-behavior: smooth;
+    }
+
+    body {
+        font-family: var(--font-primary);
+        background-color: var(--color-bg);
+        color: var(--color-body);
+        -webkit-font-smoothing: antialiased;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+        font-family: var(--font-primary);
+        font-weight: 600;
+        color: var(--color-brown);
+        line-height: 1.2;
+    }
+
+    a {
+        color: var(--color-brown);
+        text-decoration: none;
+        transition: color var(--transition-base);
+    }
+
+    a:hover {
+        color: var(--color-gold);
+    }
+
+    img {
+        display: block;
+        max-width: 100%;
+        height: auto;
+    }
+
+    /* WordPress-generated logo markup */
+    .custom-logo {
+        max-height: 48px;
+        width: auto;
+    }
+}
+
+/* ── Reusable components ── */
+@layer components {
+
+    .container {
+        width: 100%;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 24px;
+    }
+
+    .btn {
+        display: inline-block;
+        padding: 0.75rem 1.75rem;
+        background-color: var(--color-brown);
+        color: var(--color-white);
+        border: 2px solid var(--color-gold);
+        font-family: var(--font-primary);
+        font-weight: 600;
+        font-size: 0.9375rem;
+        letter-spacing: 0.04em;
+        cursor: pointer;
+        transition: background-color var(--transition-base), color var(--transition-base);
+    }
+
+    .btn:hover {
+        background-color: var(--color-gold);
+        color: var(--color-brown);
+    }
+
+    /* Mobile hamburger — display toggled by media query below */
+    .menu-toggle {
+        display: none;
+        flex-direction: column;
+        gap: 5px;
+        background: none;
+        border: none;
+        padding: 4px;
+        cursor: pointer;
+    }
+
+    .menu-toggle__bar {
+        display: block;
+        width: 24px;
+        height: 2px;
+        background-color: #ffffff;
+        transition: transform var(--transition-base), opacity var(--transition-base);
+    }
+
+    .menu-toggle.is-active .menu-toggle__bar:nth-child(1) {
+        transform: translateY(7px) rotate(45deg);
+    }
+
+    .menu-toggle.is-active .menu-toggle__bar:nth-child(2) {
+        opacity: 0;
+    }
+
+    .menu-toggle.is-active .menu-toggle__bar:nth-child(3) {
+        transform: translateY(-7px) rotate(-45deg);
+    }
+
+    /* WooCommerce button overrides */
+    .woocommerce a.button,
+    .woocommerce button.button,
+    .woocommerce input.button,
+    .woocommerce #respond input#submit {
+        background-color: var(--color-brown);
+        color: var(--color-white);
+        border: 2px solid var(--color-gold);
+        font-family: var(--font-primary);
+        font-weight: 600;
+        border-radius: 0;
+        transition: background-color var(--transition-base), color var(--transition-base);
+    }
+
+    .woocommerce a.button:hover,
+    .woocommerce button.button:hover,
+    .woocommerce input.button:hover,
+    .woocommerce #respond input#submit:hover {
+        background-color: var(--color-gold);
+        color: var(--color-brown);
+    }
+
+    /* WooCommerce notices */
+    .woocommerce-message,
+    .woocommerce-info {
+        border-top-color: var(--color-gold);
+    }
+
+    .woocommerce-message::before,
+    .woocommerce-info::before {
+        color: var(--color-gold);
+    }
+
+    /* WooCommerce shop table */
+    .woocommerce table.shop_table th {
+        background-color: var(--color-brown);
+        color: var(--color-white);
+        font-weight: 600;
+    }
+}
+
+/* ── Mobile nav — JS toggles .is-open / .is-active ── */
+@media (max-width: 1023px) {
+    .menu-toggle {
+        display: flex;
+    }
+
+    .site-nav {
+        display: none;
+        position: absolute;
+        top: 83px;
+        left: 0;
+        right: 0;
+        background-color: #371613;
+        border-bottom: 1px solid rgb(255 255 255 / 0.1);
+        padding: 1rem 1.5rem 1.5rem;
+        z-index: 50;
+    }
+
+    .site-nav.is-open {
+        display: block;
+    }
+
+    .site-nav__list {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 1rem !important;
+    }
+}
+
+/* ── Page-level backgrounds ── */
+body.single-product .site-content {
+    background-color: #f1eff0;
+}
+
+body.woocommerce-cart,
+body.woocommerce-checkout {
+    background-color: #f1eff0;
+}
+
+body.woocommerce-cart .woocommerce-notices-wrapper {
+    padding: 0 100px;
+}
+
+/* ── Cart: fulfillment tab active state ── */
+.gc-fulfillment__tab.is-active {
+    background-color: #b8542c;
+    color: #ffffff;
+}
+
+/* ── Cart: subtotal / price HTML inside summary card ── */
+.woocommerce-cart .woocommerce-Price-amount {
+    font-family: inherit;
+    font-size: inherit;
+    font-weight: inherit;
+    color: inherit;
+}
+
+/* ── Cart: hide WC's native cart totals table (we render our own) ── */
+.woocommerce-cart .cart_totals {
+    display: none;
+}
+
+/* ── Single product: WooCommerce form overrides ──
+ * High specificity needed to beat WooCommerce's unlayered defaults.
+ */
+.sp .variations,
+.sp .reset_variations_alert,
+.sp .woocommerce-variation-description {
+    display: none;
+}
+
+.sp .woocommerce-variation-add-to-cart {
+    display: flex;
+    flex-direction: column;
+}
+
+.sp form.cart {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+}
+
+.sp form.cart div.quantity {
+    float: none;
+    margin: 0;
+    flex-shrink: 0;
+}
+
+/* Needs (0,4,1) specificity to beat WooCommerce's (0,3,1) default */
+body.single-product .sp .single_add_to_cart_button,
+body.single-product .sp .single_add_to_cart_button.alt,
+body.single-product .sp .single_add_to_cart_button.button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    height: 56px;
+    padding: 0 20px;
+    background: #6c290f;
+    color: #ffffff;
+    border: none;
+    border-radius: 100px;
+    box-shadow: inset 0 0 0 2px #ffffff;
+    font-family: 'Lato', sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    letter-spacing: 0.9px;
+    line-height: 1;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background-color 0.2s;
+    box-sizing: border-box;
+    text-shadow: none;
+}
+
+body.single-product .sp .single_add_to_cart_button:hover,
+body.single-product .sp .single_add_to_cart_button.alt:hover {
+    background: #8b3515;
+    color: #ffffff;
+}
+
+body.single-product .sp .single_add_to_cart_button.disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* ── Qty input: remove browser number spinners ── */
+.sp-qty-box input.qty {
+    -moz-appearance: textfield;
+}
+
+.sp-qty-box input.qty::-webkit-inner-spin-button,
+.sp-qty-box input.qty::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* ── JS-toggled active states ── */
+
+/* Thumbnail cards */
+.sp__thumb {
+    width: 96px;
+    height: 96px;
+    background: #ffffff;
+    border: 1px solid #ded8d4;
+    border-radius: 12px;
+    overflow: hidden;
+    cursor: pointer;
+    flex-shrink: 0;
+    padding: 0;
+    transition: border-color 0.15s ease, border-width 0.15s ease;
+}
+
+.sp__thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.sp__thumb.is-active {
+    border: 2px solid #6c290f;
+}
+
+/* Size pill cards */
+.sp-size-pill {
+    background: #ffffff;
+    border-color: #ded8d4;
+    color: #2c1a0e;
+}
+
+.sp-size-pill.is-active {
+    background: #6c290f;
+    border-color: #6c290f;
+    color: #ffffff;
+}
+
+.sp-size-pill:hover:not(.is-active) {
+    background: #fdf5f1;
+    border-color: #c5b0a6;
+}
+
+.sp-size-pill__name {
+    color: inherit;
+}
+
+.sp-size-pill__meta {
+    color: inherit;
+}
+
+.gc-fulfillment__tab.is-active {
+    background-color: #b8542c;
+    color: #ffffff;
+}
+
+.gc-date-picker.is-open,
+.gc-time-picker.is-open {
+    border-width: 2px;
+}
+
+.gc-radio.is-selected {
+    background: #6c290f;
+}
+
+.gc-radio__dot {
+    display: none;
+}
+
+.gc-radio.is-selected .gc-radio__dot {
+    display: block;
+}
+
+/* ── Cart: hidden WooCommerce update button ── */
+.gc-update-cart {
+    position: absolute;
+    left: -9999px;
+}
+
+/* ── Cart: time slot dropdown (JS-generated positioning) ── */
+.gc-time-picker-wrap {
+    position: relative;
+}
+
+.gc-time-dropdown {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    background: #ffffff;
+    border: 1px solid #6c290f;
+    border-radius: 6px;
+    z-index: 200;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+}
+
+.gc-time-dropdown[aria-hidden="true"] {
+    display: none;
+}
+
+.gc-time-slot {
+    display: block;
+    width: 100%;
+    padding: 10px 14px;
+    background: none;
+    border: none;
+    border-bottom: 1px solid rgba(108, 41, 15, 0.15);
+    cursor: pointer;
+    font-family: 'Lato', sans-serif;
+    font-size: 13px;
+    color: #000000;
+    text-align: left;
+    box-sizing: border-box;
+    transition: background-color 0.15s;
+}
+
+.gc-time-slot:last-child {
+    border-bottom: none;
+}
+
+.gc-time-slot:hover {
+    background-color: rgba(108, 41, 15, 0.08);
+}
+
+.gc-time-slot.is-selected {
+    background-color: #6c290f;
+    color: #ffffff;
+}
+
+/* ── Checkout page ── */
+body.woocommerce-checkout .woocommerce-notices-wrapper {
+    padding: 0 100px;
+}
+
+/* Hide WC's default checkout order review (we render our own sidebar) */
+body.woocommerce-checkout #order_review_heading,
+body.woocommerce-checkout #order_review,
+body.woocommerce-checkout .woocommerce-checkout-review-order {
+    display: none !important;
+}
+
+/* Price HTML inherits color/font inside checkout sidebar */
+body.woocommerce-checkout .woocommerce-Price-amount {
+    font-family: inherit;
+    font-size: inherit;
+    font-weight: inherit;
+    color: inherit;
+}
+
+/* Text inputs: WC adds its own border/outline; override to our design tokens */
+body.woocommerce-checkout .gc-field:focus {
+    outline: none;
+    border-color: #6c290f;
+    box-shadow: none;
+}
+
+/* ── Cart: date picker calendar (JS-generated HTML) ── */
+.gc-date-picker-wrap {
+    position: relative;
+}
+
+.gc-calendar {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 50%;
+    transform: translateX(-50%);
+    width: 310px;
+    background: #ffffff;
+    border: 1px solid #6c290f;
+    border-radius: 15px;
+    padding: 16px 16px 20px;
+    box-sizing: border-box;
+    z-index: 200;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+.gc-calendar[aria-hidden="true"] {
+    display: none;
+}
+
+.gc-cal__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 4px 0 14px;
+}
+
+.gc-cal__month {
+    font-family: 'Lato', sans-serif;
+    font-size: 16px;
+    line-height: 24px;
+    color: #000000;
+}
+
+.gc-cal__nav {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0 6px;
+    color: #000000;
+    font-size: 18px;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+}
+
+.gc-cal__nav:hover {
+    color: #6c290f;
+}
+
+.gc-cal__weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    margin-bottom: 10px;
+}
+
+.gc-cal__weekdays span {
+    font-family: 'Lato', sans-serif;
+    font-size: 13px;
+    line-height: 24px;
+    color: #000000;
+    text-align: center;
+    overflow: hidden;
+}
+
+.gc-cal__grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    row-gap: 2px;
+}
+
+.gc-cal__day,
+.gc-cal__empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 0;
+    font-family: 'Lato', sans-serif;
+    font-size: 15px;
+    color: #000000;
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.15s;
+}
+
+.gc-cal__empty {
+    cursor: default;
+    pointer-events: none;
+}
+
+.gc-cal__day:hover {
+    background-color: rgba(108, 41, 15, 0.12);
+    border-radius: 4px;
+}
+
+.gc-cal__day.is-selected {
+    background-color: #6c290f;
+    color: #ffffff;
+    border-radius: 4px;
+}
