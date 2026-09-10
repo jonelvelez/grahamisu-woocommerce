@@ -57,6 +57,9 @@ $order_total = WC()->cart->get_total( 'edit' );
               enctype="multipart/form-data">
 
             <?php wp_nonce_field( 'woocommerce-process_checkout', 'woocommerce-process-checkout-nonce' ); ?>
+            <input type="hidden" id="gc-nonce-shipping" value="<?php echo esc_attr( wp_create_nonce( 'gc-update-shipping' ) ); ?>">
+            <input type="hidden" name="gc_delivery_date" id="gc-delivery-date" value="">
+            <input type="hidden" name="gc_delivery_time" id="gc-delivery-time" value="">
             <input type="hidden" name="billing_country"  value="PH">
             <input type="hidden" name="billing_state"    value="00">
             <input type="hidden" name="billing_city"     value="Manila">
@@ -147,8 +150,32 @@ $order_total = WC()->cart->get_total( 'edit' );
                             <path d="M1 8H17" stroke="#6c290f" stroke-width="1.5"/>
                             <path d="M5 1V5M13 1V5" stroke="#6c290f" stroke-width="1.5" stroke-linecap="round"/>
                         </svg>
-                        <span class="flex-1"><?php esc_html_e( 'Choose a date and time', 'grahamisu' ); ?></span>
+                        <span class="flex-1"><?php esc_html_e( 'Choose a pickup date', 'grahamisu' ); ?></span>
                     </button>
+
+                    <!-- Time slot picker (pickup only — delivery has a fixed 10am–2pm window) -->
+                    <div class="gc-time-picker-wrap">
+                        <button type="button"
+                                class="gc-time-picker w-full flex items-center gap-3 h-[52px] px-4 bg-white border border-rust rounded-[12px] cursor-pointer font-['Lato',sans-serif] font-normal text-[14px] text-[#a9a29c] text-left box-border">
+                            <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                <circle cx="9" cy="9" r="8" stroke="#6c290f" stroke-width="1.5"/>
+                                <path d="M9 5V9L11.5 11.5" stroke="#6c290f" stroke-width="1.5" stroke-linecap="round"/>
+                            </svg>
+                            <span class="flex-1"><?php esc_html_e( 'Choose a pickup time', 'grahamisu' ); ?></span>
+                        </button>
+                        <div class="gc-time-dropdown" aria-hidden="true">
+                            <?php
+                            $slots = [ '9:00am – 10:00am', '10:00am – 11:00am', '11:00am – 12:00pm',
+                                       '12:00pm – 1:00pm',  '1:00pm – 2:00pm',   '2:00pm – 3:00pm',
+                                       '3:00pm – 4:00pm',   '4:00pm – 5:00pm',   '5:00pm – 6:00pm' ];
+                            foreach ( $slots as $slot ) : ?>
+                            <button type="button" class="gc-time-slot"
+                                    data-slot="<?php echo esc_attr( $slot ); ?>">
+                                <?php echo esc_html( $slot ); ?>
+                            </button>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Delivery fields -->
@@ -222,8 +249,15 @@ $order_total = WC()->cart->get_total( 'edit' );
                 </div>
             </div>
 
+            <!-- ── ORDER NOTES ── -->
+            <div>
+                <textarea name="gc_order_notes" rows="3"
+                          placeholder="<?php esc_attr_e( 'Special instructions (optional)', 'grahamisu' ); ?>"
+                          class="gc-field w-full bg-white border border-[#d1d5db] rounded-[12px] px-[18px] py-[14px] font-['Lato',sans-serif] font-normal text-[15px] text-[#4e4e4e] placeholder-[#a9a29c] outline-none focus:border-rust transition-colors resize-none"></textarea>
+            </div>
+
             <!-- ── PLACE ORDER ── -->
-            <button type="submit"
+            <button type="submit" id="gc-place-order-btn"
                     class="w-full h-[60px] bg-rust text-white rounded-[100px] font-['Lato',sans-serif] font-bold text-[16px] tracking-[0.96px] border-0 cursor-pointer transition-colors hover:bg-[#8b3515] flex items-center justify-center"
                     style="box-shadow: inset 0 0 0 2px #ffffff;">
                 <?php
@@ -308,16 +342,14 @@ $order_total = WC()->cart->get_total( 'edit' );
                     <?php echo wc_price( $subtotal ); // phpcs:ignore ?>
                 </span>
             </div>
-            <?php if ( $shipping > 0 ) : ?>
-            <div class="flex justify-between mb-3">
+            <div id="gc-shipping-row" class="flex justify-between mb-3"<?php echo $shipping <= 0 ? ' hidden' : ''; ?>>
                 <span class="font-['Lato',sans-serif] font-normal text-[15px] text-[#4e4e4e]">
                     <?php esc_html_e( 'Delivery fee', 'grahamisu' ); ?>
                 </span>
-                <span class="font-['Lato',sans-serif] font-bold text-[15px] text-[#2c1a0e] [&_.woocommerce-Price-amount]:text-inherit">
-                    <?php echo wc_price( $shipping ); // phpcs:ignore ?>
+                <span id="gc-shipping-amount" class="font-['Lato',sans-serif] font-bold text-[15px] text-[#2c1a0e]">
+                    <?php echo strip_tags( wc_price( $shipping ) ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
                 </span>
             </div>
-            <?php endif; ?>
 
             <!-- Divider -->
             <div class="bg-[#e4deda] h-px mb-5"></div>
@@ -327,8 +359,8 @@ $order_total = WC()->cart->get_total( 'edit' );
                 <span class="font-['Lato',sans-serif] font-bold text-[13px] text-brown tracking-[1.82px] uppercase">
                     <?php esc_html_e( 'Total', 'grahamisu' ); ?>
                 </span>
-                <span class="font-primary font-normal text-[30px] text-rust leading-none [&_.woocommerce-Price-amount]:text-inherit">
-                    <?php echo wc_price( $order_total ); // phpcs:ignore ?>
+                <span id="gc-order-total" class="font-primary font-normal text-[30px] text-rust leading-none">
+                    <?php echo strip_tags( wc_price( $order_total ) ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
                 </span>
             </div>
 
@@ -347,11 +379,16 @@ $order_total = WC()->cart->get_total( 'edit' );
         '.gc-delivery-fields input[name="billing_address_1"], .gc-delivery-fields input[name="billing_postcode"]'
     );
 
+    var timeInput = document.getElementById('gc-delivery-time');
+
     function syncDeliveryFields(isPickup) {
         deliveryAddressFields.forEach(function (field) {
             field.required = !isPickup;
             field.disabled = isPickup;
         });
+        // Delivery has a fixed window — set it automatically; pickup time comes from the time picker.
+        if (!isPickup && timeInput) timeInput.value = '10:00am – 2:00pm';
+        if (isPickup && timeInput)  timeInput.value = '';
     }
 
     document.querySelectorAll('.gc-fulfillment__tab').forEach(function (tab) {
@@ -360,7 +397,49 @@ $order_total = WC()->cart->get_total( 'edit' );
         });
     });
 
-    syncDeliveryFields(false); // delivery active by default
+    syncDeliveryFields(false); // delivery active by default — pre-fill delivery time
+
+    // ── Shipping method AJAX update ──
+    // Fires when the customer switches Pickup ↔ Delivery tabs.
+    // Updates the WC session and refreshes displayed totals without a page reload.
+    var shippingNonce = document.getElementById('gc-nonce-shipping');
+    shippingNonce = shippingNonce ? shippingNonce.value : '';
+
+    function gcUpdateShipping(rateId) {
+        if (!shippingNonce || !rateId) return;
+        var params = new URLSearchParams({
+            action:  'gc_update_shipping',
+            rate_id: rateId,
+            nonce:   shippingNonce,
+        });
+        fetch('/?wc-ajax=gc_update_shipping', {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body:    params.toString(),
+        })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            if (!data.success) return;
+            var shippingRow = document.getElementById('gc-shipping-row');
+            var shippingAmt = document.getElementById('gc-shipping-amount');
+            var totalAmt    = document.getElementById('gc-order-total');
+            var placeBtn    = document.getElementById('gc-place-order-btn');
+            if (data.data.shipping > 0) {
+                if (shippingRow) shippingRow.removeAttribute('hidden');
+                if (shippingAmt) shippingAmt.textContent = data.data.shipping_formatted;
+            } else {
+                if (shippingRow) shippingRow.setAttribute('hidden', '');
+            }
+            if (totalAmt) totalAmt.textContent = data.data.total_formatted;
+            if (placeBtn) placeBtn.textContent = 'Place order · ' + data.data.total_formatted;
+        });
+    }
+
+    document.querySelectorAll('.gc-fulfillment__tab').forEach(function(tab) {
+        tab.addEventListener('click', function() {
+            gcUpdateShipping(tab.dataset.shippingMethod);
+        });
+    });
 
     // ── Coupon AJAX ──
     var btn = document.getElementById('gc-apply-coupon');

@@ -194,6 +194,9 @@ document.addEventListener('DOMContentLoaded', function () {
                         var parts = selectedDate.split('-');
                         var display = MONTHS[parseInt(parts[1], 10) - 1] + ' ' + parseInt(parts[2], 10) + ', ' + parts[0];
                         btn.querySelector('span').textContent = display;
+                        // Populate the hidden date input on the checkout form
+                        var dateInput = document.getElementById('gc-delivery-date');
+                        if (dateInput) dateInput.value = selectedDate;
                         close();
                     });
                 });
@@ -255,6 +258,9 @@ document.addEventListener('DOMContentLoaded', function () {
             slot.addEventListener('click', function (e) {
                 e.stopPropagation();
                 btn.querySelector('span').textContent = slot.dataset.slot;
+                // Populate the hidden time input on the checkout form
+                var timeInput = document.getElementById('gc-delivery-time');
+                if (timeInput) timeInput.value = slot.dataset.slot;
                 close();
             });
         });

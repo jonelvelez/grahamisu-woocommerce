@@ -410,9 +410,94 @@ function grahamisu_email_log_page() {
     <?php
 }
 
-// ── City and State are not shown in the checkout design — make them optional
+// ── Checkout: save fulfillment meta (date, time, notes) on order creation ────
+add_action( 'woocommerce_checkout_create_order', 'grahamisu_save_fulfillment_meta', 10, 2 );
+function grahamisu_save_fulfillment_meta( WC_Order $order, array $data ) {
+    $date  = sanitize_text_field( wp_unslash( $_POST['gc_delivery_date']  ?? '' ) );
+    $time  = sanitize_text_field( wp_unslash( $_POST['gc_delivery_time']  ?? '' ) );
+    $notes = sanitize_textarea_field( wp_unslash( $_POST['gc_order_notes'] ?? '' ) );
+
+    if ( $date )  $order->update_meta_data( '_gc_delivery_date',  $date );
+    if ( $time )  $order->update_meta_data( '_gc_delivery_time',  $time );
+    if ( $notes ) $order->update_meta_data( '_gc_order_notes',    $notes );
+}
+
+// Display fulfillment meta in WP Admin → Order detail page
+add_action( 'woocommerce_admin_order_data_after_billing_address', 'grahamisu_admin_order_fulfillment' );
+function grahamisu_admin_order_fulfillment( WC_Order $order ) {
+    $date  = $order->get_meta( '_gc_delivery_date' );
+    $time  = $order->get_meta( '_gc_delivery_time' );
+    $notes = $order->get_meta( '_gc_order_notes' );
+    if ( ! $date && ! $time && ! $notes ) return;
+    ?>
+    <div style="margin-top:12px;padding:10px 12px;background:#fdf5f0;border:1px solid #e2c5b0;border-radius:4px;">
+        <strong style="display:block;margin-bottom:6px;font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:#61453a;">
+            Fulfillment Details
+        </strong>
+        <?php if ( $date ) : ?>
+            <p style="margin:2px 0;font-size:13px;"><strong>Date:</strong> <?php echo esc_html( $date ); ?></p>
+        <?php endif; ?>
+        <?php if ( $time ) : ?>
+            <p style="margin:2px 0;font-size:13px;"><strong>Time:</strong> <?php echo esc_html( $time ); ?></p>
+        <?php endif; ?>
+        <?php if ( $notes ) : ?>
+            <p style="margin:2px 0;font-size:13px;"><strong>Notes:</strong> <?php echo esc_html( $notes ); ?></p>
+        <?php endif; ?>
+    </div>
+    <?php
+}
+
+// ── Billing address fields: make optional in WC (custom validation below handles it)
 add_filter( 'woocommerce_checkout_fields', function( $fields ) {
-    $fields['billing']['billing_city']['required']  = false;
-    $fields['billing']['billing_state']['required'] = false;
+    $fields['billing']['billing_city']['required']      = false;
+    $fields['billing']['billing_state']['required']     = false;
+    $fields['billing']['billing_address_1']['required'] = false;
+    $fields['billing']['billing_postcode']['required']  = false;
     return $fields;
 } );
+
+// Require address fields only when delivery (flat_rate) is selected.
+// Pickup customers don't need to provide an address.
+add_action( 'woocommerce_after_checkout_validation', 'grahamisu_validate_delivery_address', 10, 2 );
+function grahamisu_validate_delivery_address( array $data, WP_Error $errors ) {
+    $method      = sanitize_text_field( wp_unslash( $_POST['shipping_method'][0] ?? '' ) );
+    $is_delivery = str_starts_with( $method, 'flat_rate' );
+    if ( ! $is_delivery ) return;
+
+    if ( empty( $_POST['billing_address_1'] ) ) {
+        $errors->add( 'billing_address_required', __( '<strong>Street address</strong> is a required field for delivery.', 'grahamisu' ) );
+    }
+    if ( empty( $_POST['billing_postcode'] ) ) {
+        $errors->add( 'billing_postcode_required', __( '<strong>Postal code</strong> is a required field for delivery.', 'grahamisu' ) );
+    }
+}
+
+// ── Checkout: AJAX shipping method update ─────────────────────────────────────
+// Updates the WC session's chosen shipping method and returns fresh totals.
+// Called by JS when the customer switches between Pickup and Delivery tabs.
+// Uses wc_ajax_* hooks so the endpoint is available to non-logged-in users
+// at /?wc-ajax=gc_update_shipping (same pattern as WC's own coupon endpoint).
+add_action( 'wc_ajax_gc_update_shipping',        'grahamisu_update_shipping' );
+add_action( 'wc_ajax_nopriv_gc_update_shipping', 'grahamisu_update_shipping' );
+function grahamisu_update_shipping() {
+    check_ajax_referer( 'gc-update-shipping', 'nonce' );
+
+    $rate_id = sanitize_text_field( wp_unslash( $_POST['rate_id'] ?? '' ) );
+    if ( ! $rate_id ) {
+        wp_send_json_error( 'Missing rate_id.' );
+    }
+
+    WC()->session->set( 'chosen_shipping_methods', [ $rate_id ] );
+    WC()->cart->calculate_shipping();
+    WC()->cart->calculate_totals();
+
+    $shipping_total = WC()->cart->get_shipping_total();
+    $order_total    = (float) WC()->cart->get_total( 'edit' );
+
+    wp_send_json_success( [
+        'shipping'           => $shipping_total,
+        'total'              => $order_total,
+        'shipping_formatted' => html_entity_decode( strip_tags( wc_price( $shipping_total ) ), ENT_HTML5, 'UTF-8' ),
+        'total_formatted'    => html_entity_decode( strip_tags( wc_price( $order_total ) ),    ENT_HTML5, 'UTF-8' ),
+    ] );
+}

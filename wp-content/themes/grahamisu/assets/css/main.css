@@ -305,6 +305,9 @@
   .my-\[30px\] {
     margin-block: 30px;
   }
+  .mt-0 {
+    margin-top: 0px;
+  }
   .mt-0\.5 {
     margin-top: calc(var(--spacing) * 0.5);
   }
@@ -627,8 +630,14 @@
   .flex-\[1\.4\] {
     flex: 1.4;
   }
+  .flex-shrink {
+    flex-shrink: 1;
+  }
   .shrink-0 {
     flex-shrink: 0;
+  }
+  .flex-grow {
+    flex-grow: 1;
   }
   .grow {
     flex-grow: 1;
@@ -641,6 +650,9 @@
   }
   .cursor-pointer {
     cursor: pointer;
+  }
+  .resize {
+    resize: both;
   }
   .resize-none {
     resize: none;
@@ -1049,6 +1061,9 @@
   .py-\[13px\] {
     padding-block: 13px;
   }
+  .py-\[14px\] {
+    padding-block: 14px;
+  }
   .py-\[15px\] {
     padding-block: 15px;
   }
@@ -1123,6 +1138,9 @@
   }
   .pr-\[148px\] {
     padding-right: 148px;
+  }
+  .pb-0 {
+    padding-bottom: 0px;
   }
   .pb-0\.5 {
     padding-bottom: calc(var(--spacing) * 0.5);
