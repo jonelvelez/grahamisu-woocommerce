@@ -5,7 +5,7 @@ $shop_url = function_exists( 'wc_get_page_id' )
     : home_url( '/shop' );
 ?>
 
-<section class="bg-white w-full">
+<section class="bg-white w-full overflow-hidden">
     <div class="max-w-[1440px] mx-auto pt-[82px] pb-[80px]">
 
         <div class="flex items-end justify-between px-6 lg:pl-[146px] lg:pr-[167px] mb-[23px]">
@@ -35,7 +35,7 @@ $shop_url = function_exists( 'wc_get_page_id' )
                 </span>
             </div>
 
-            <div class="w-full lg:shrink-0 grid grid-cols-2 gap-4 lg:grid-cols-[263px_263px] lg:grid-rows-[335px_335px] lg:gap-x-[31px] lg:gap-y-[30px]">
+            <div class="w-full lg:flex-1 lg:min-w-0 grid grid-cols-2 gap-4 lg:grid-rows-[335px_335px] lg:gap-x-[31px] lg:gap-y-[30px]">
                 <div class="rounded-[20px] overflow-hidden h-[180px] lg:h-full">
                     <img src="<?php echo esc_url( $img . 'gallery-sm-1.png' ); ?>"
                          alt="Tiramisu cake with cacao"
