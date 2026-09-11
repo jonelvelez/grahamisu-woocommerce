@@ -47,7 +47,7 @@ get_header();
 
         <!-- ── Title bar ─────────────────────────────────────────── -->
         <div class="bg-white border-b border-[#e4deda]">
-            <div class="max-w-[1240px] mx-auto px-8 pt-[64px] pb-[56px] grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_minmax(0,340px)] gap-16 items-end">
+            <div class="max-w-[1240px] mx-auto px-6 pt-8 pb-8 lg:px-8 lg:pt-[64px] lg:pb-[56px] grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_minmax(0,340px)] gap-8 lg:gap-16 items-end">
                 <div>
                     <p class="font-['Lato',sans-serif] font-bold text-[12px] tracking-[.20em] uppercase text-rust m-0">Find your size</p>
                     <h1 class="font-primary font-normal text-[48px] lg:text-[60px] leading-[1.02] tracking-[-0.015em] text-[#2c1a0e] m-0 mt-[14px]">Our products</h1>
@@ -59,7 +59,7 @@ get_header();
         </div>
 
         <!-- ── Filter bar ────────────────────────────────────────── -->
-        <div class="max-w-[1240px] mx-auto px-8 pt-[26px] flex items-center justify-between gap-6 flex-wrap">
+        <div class="max-w-[1240px] mx-auto px-6 lg:px-8 pt-[26px] flex items-center justify-between gap-6 flex-wrap">
             <p class="font-['Lato',sans-serif] text-[13px] tracking-[.06em] text-muted m-0">
                 Showing all <strong class="text-[#2c1a0e]"><?php echo esc_html( $product_count ); ?> tub<?php echo $product_count !== 1 ? 's' : ''; ?></strong>
             </p>
@@ -74,11 +74,11 @@ get_header();
         </div>
 
         <!-- ── Product grid ──────────────────────────────────────── -->
-        <div class="max-w-[1240px] mx-auto px-8 pt-[28px] pb-[88px]">
+        <div class="max-w-[1240px] mx-auto px-6 lg:px-8 pt-[28px] pb-12 lg:pb-[88px]">
 
             <?php if ( $products_query->have_posts() ) : ?>
 
-            <div class="grid grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 <?php while ( $products_query->have_posts() ) : $products_query->the_post();
                     $product   = wc_get_product( get_the_ID() );
                     $slug      = $product->get_slug();
