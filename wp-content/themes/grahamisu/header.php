@@ -17,7 +17,7 @@
 <?php wp_body_open(); ?>
 
 <header class="sticky top-0 z-[100] bg-dark w-full">
-    <div class="flex items-center h-[83px] max-w-[1440px] mx-auto pl-[155px] pr-[148px]">
+    <div class="flex items-center h-[83px] max-w-[1440px] mx-auto px-4 lg:pl-[155px] lg:pr-[148px]">
 
         <div class="shrink-0">
             <?php if ( has_custom_logo() ) : ?>
@@ -48,7 +48,7 @@
             ) ); ?>
         </nav>
 
-        <div class="shrink-0 ml-[55px]">
+        <div class="shrink-0 ml-3 lg:ml-[55px]">
             <?php if ( class_exists( 'WooCommerce' ) ) : ?>
                 <a href="<?php echo esc_url( wc_get_cart_url() ); ?>"
                    class="relative text-white flex items-center no-underline hover:text-gold"
