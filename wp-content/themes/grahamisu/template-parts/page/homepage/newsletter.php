@@ -10,18 +10,39 @@
             </p>
         </div>
 
-        <form class="relative flex items-center w-full lg:w-[480px] lg:shrink-0" action="#" method="post">
-            <input
-                type="email"
-                name="newsletter_email"
-                placeholder="you@email.com"
-                class="w-full h-[56px] rounded-[100px] bg-white pl-5 pr-[148px] font-['Lato',sans-serif] text-[15px] text-[#a9a29c] placeholder-[#a9a29c] border-0 outline-none focus:outline-none"
-            >
-            <button type="submit"
-                    class="absolute right-0 top-0 h-[56px] px-6 bg-dark text-white rounded-[100px] font-['Lato',sans-serif] font-bold text-[14px] tracking-[1.12px] border-0 cursor-pointer hover:bg-[#4a1e1a] transition-colors whitespace-nowrap">
-                Subscribe
-            </button>
-        </form>
+        <div class="w-full lg:w-[480px] lg:shrink-0">
+            <form id="gc-newsletter-form" class="relative flex items-center" action="#" method="post">
+                <input
+                    type="email"
+                    name="newsletter_email"
+                    placeholder="you@email.com"
+                    required
+                    class="w-full h-[56px] rounded-[100px] bg-white pl-5 pr-[148px] font-['Lato',sans-serif] text-[15px] text-[#a9a29c] placeholder-[#a9a29c] border-0 outline-none focus:outline-none"
+                >
+                <button type="submit"
+                        class="absolute right-0 top-0 h-[56px] px-6 bg-dark text-white rounded-[100px] font-['Lato',sans-serif] font-bold text-[14px] tracking-[1.12px] border-0 cursor-pointer hover:bg-[#4a1e1a] transition-colors whitespace-nowrap">
+                    Subscribe
+                </button>
+            </form>
+            <div id="gc-newsletter-thanks" class="hidden h-[56px] flex items-center gap-3 px-5 bg-white rounded-[100px]">
+                <span class="text-rust text-[18px] leading-none">&#10003;</span>
+                <span class="font-['Lato',sans-serif] text-[15px] text-[#2c1a0e]">You're on the list — talk soon!</span>
+            </div>
+        </div>
+
+        <script>
+        (function () {
+            var form   = document.getElementById('gc-newsletter-form');
+            var thanks = document.getElementById('gc-newsletter-thanks');
+            if (!form || !thanks) return;
+            form.addEventListener('submit', function (e) {
+                e.preventDefault();
+                form.classList.add('hidden');
+                thanks.classList.remove('hidden');
+                thanks.classList.add('flex');
+            });
+        }());
+        </script>
 
     </div>
 </section>
