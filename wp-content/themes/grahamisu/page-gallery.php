@@ -92,10 +92,15 @@ $total = count( $gallery_items );
              tabindex="0"
              aria-label="<?php echo esc_attr( 'View: ' . $item['title'] ); ?>">
 
-            <?php if ( $img_url ) : ?>
-            <img src="<?php echo esc_url( $img_url ); ?>"
-                 alt="<?php echo esc_attr( $item['title'] ); ?>"
-                 class="absolute inset-0 w-full h-full object-cover">
+            <?php if ( $img_url ) :
+                $webp_url = preg_replace( '/\.(png|jpe?g)$/i', '.webp', $img_url );
+            ?>
+            <picture>
+                <source srcset="<?php echo esc_url( $webp_url ); ?>" type="image/webp">
+                <img src="<?php echo esc_url( $img_url ); ?>"
+                     alt="<?php echo esc_attr( $item['title'] ); ?>"
+                     class="absolute inset-0 w-full h-full object-cover">
+            </picture>
             <?php endif; ?>
 
             <div class="gc-gallery__caption absolute bottom-0 left-0 right-0 <?php echo $tall ? 'h-[128px]' : 'h-[104px]'; ?> flex flex-col justify-end px-5 pb-5"

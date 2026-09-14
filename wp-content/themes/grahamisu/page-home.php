@@ -13,6 +13,8 @@
 
 <?php get_template_part( 'template-parts/page/homepage/products' ); ?>
 
+<?/*php get_template_part( 'template-parts/page/homepage/about' ); */?>
+
 <?php get_template_part( 'template-parts/page/homepage/gallery' ); ?>
 
 <?php get_template_part( 'template-parts/page/homepage/testimonial' ); ?>

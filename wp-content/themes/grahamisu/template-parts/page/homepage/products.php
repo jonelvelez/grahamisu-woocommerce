@@ -66,7 +66,7 @@ $products = array(
                 <div class="w-[120px] h-[120px] lg:w-[148px] lg:h-[148px] rounded-full bg-surface flex items-center justify-center mb-6 shrink-0 overflow-hidden">
                     <img
                         src="<?php echo esc_url( $product['image'] ); ?>"
-                        alt="<?php echo esc_attr( $product['name'] ); ?>"
+                        alt="<?php echo esc_attr( 'Grahamisu ' . $product['name'] . ' tiramisu' ); ?>"
                         width="148"
                         height="148"
                         class="w-full h-full object-cover block rounded-full"

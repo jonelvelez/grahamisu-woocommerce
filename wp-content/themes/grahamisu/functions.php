@@ -20,16 +20,9 @@ function grahamisu_assets() {
     );
 
     wp_enqueue_style(
-        'grahamisu-style',
-        get_stylesheet_uri(),
-        array( 'grahamisu-fonts' ),
-        wp_get_theme()->get( 'Version' )
-    );
-
-    wp_enqueue_style(
         'grahamisu-main',
         get_template_directory_uri() . '/assets/css/main.css',
-        array( 'grahamisu-style' ),
+        array( 'grahamisu-fonts' ),
         '2.3.0'
     );
 
@@ -42,6 +35,78 @@ function grahamisu_assets() {
     );
 }
 add_action( 'wp_enqueue_scripts', 'grahamisu_assets' );
+
+// ── Performance: preconnect for Google Fonts ──────────────────────────────────
+add_action( 'wp_head', function() {
+    echo '<link rel="preconnect" href="https://fonts.googleapis.com">' . "\n";
+    echo '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>' . "\n";
+}, 1 );
+
+// ── Performance: non-blocking Google Fonts + defer theme script ───────────────
+add_filter( 'style_loader_tag', function( $html, $handle ) {
+    if ( is_admin() ) return $html;
+
+    // Convert Google Fonts to preload so it doesn't block render
+    if ( 'grahamisu-fonts' === $handle ) {
+        preg_match( '/href=["\']([^"\']+)["\']/', $html, $m );
+        if ( ! empty( $m[1] ) ) {
+            $href = esc_url( $m[1] );
+            return '<link rel="preload" href="' . $href . '" as="style" onload="this.onload=null;this.rel=\'stylesheet\'">' . "\n"
+                 . '<noscript>' . $html . '</noscript>' . "\n";
+        }
+    }
+
+    // Preload mobile-only WooCommerce CSS — not needed for initial render
+    if ( 'woocommerce-smallscreen' === $handle ) {
+        preg_match( '/href=["\']([^"\']+)["\']/', $html, $m );
+        if ( ! empty( $m[1] ) ) {
+            $href = esc_url( $m[1] );
+            return '<link rel="preload" href="' . $href . '" as="style" onload="this.onload=null;this.rel=\'stylesheet\'">' . "\n"
+                 . '<noscript>' . $html . '</noscript>' . "\n";
+        }
+    }
+
+    // Preload WC layout CSS on non-WooCommerce pages (homepage, gallery, etc.)
+    // WC pages (shop, cart, checkout, product) still load synchronously
+    $wc_non_critical = [ 'woocommerce-layout', 'woocommerce-general' ];
+    if ( in_array( $handle, $wc_non_critical, true ) && ! is_woocommerce() && ! is_cart() && ! is_checkout() && ! is_account_page() ) {
+        preg_match( '/href=["\']([^"\']+)["\']/', $html, $m );
+        if ( ! empty( $m[1] ) ) {
+            $href = esc_url( $m[1] );
+            return '<link rel="preload" href="' . $href . '" as="style" onload="this.onload=null;this.rel=\'stylesheet\'">' . "\n"
+                 . '<noscript>' . $html . '</noscript>' . "\n";
+        }
+    }
+
+    return $html;
+}, 10, 2 );
+
+// Defer all frontend scripts — defer preserves execution order so jQuery → WC chain is safe
+add_filter( 'script_loader_tag', function( $tag, $handle ) {
+    if ( is_admin() ) return $tag;
+    if ( strpos( $tag, ' defer' ) !== false || strpos( $tag, ' async' ) !== false ) return $tag;
+    return str_replace( '<script ', '<script defer ', $tag );
+}, 10, 2 );
+
+// ── Performance: dequeue Rank Math frontend CSS — no breadcrumbs or contact widget used ──
+add_action( 'wp_enqueue_scripts', function() {
+    wp_dequeue_style( 'rank-math' );
+    wp_dequeue_style( 'rank-math-seo-score' );
+}, 100 );
+
+// ── Performance: dequeue WC Blocks CSS — theme uses classic templates ─────────
+add_action( 'wp_enqueue_scripts', function() {
+    if ( is_admin() ) return;
+    $wc_block_styles = [
+        'wc-blocks-style',
+        'wc-blocks-vendors-style',
+        'wc-blocks-editor-style',
+    ];
+    foreach ( $wc_block_styles as $handle ) {
+        wp_dequeue_style( $handle );
+        wp_deregister_style( $handle );
+    }
+}, 100 );
 
 // Force woocommerce.php for checkout + order-received — bypasses WooCommerce Blocks / page.php
 add_filter( 'template_include', function( $template ) {

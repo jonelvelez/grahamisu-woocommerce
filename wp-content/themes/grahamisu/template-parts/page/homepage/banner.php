@@ -19,7 +19,7 @@ $shop_url = function_exists( 'wc_get_page_id' )
             </h1>
 
             <p class="font-['Lato',sans-serif] text-[16px] lg:text-[17px] font-normal text-[#ffe9e9] leading-[1.65] opacity-[0.92] mb-6 lg:mb-[38px] max-w-[420px]">
-                A classic Italian dessert made with espresso-soaked ladyfingers, mascarpone, and cocoa — layered fresh the day before it reaches you.
+                Grahamisu is a classic Italian dessert made with espresso-soaked ladyfingers, mascarpone, and cocoa — layered fresh the day before it reaches you.
             </p>
 
             <div class="flex items-center gap-5 lg:gap-6">
@@ -35,13 +35,16 @@ $shop_url = function_exists( 'wc_get_page_id' )
         </div>
 
         <div class="relative w-full lg:shrink-0 lg:w-[440px]">
-            <img
-                src="<?php echo esc_url( get_template_directory_uri() . '/assets/images/banner-tiramisu.png' ); ?>"
-                alt="Grahamisu tiramisu cake"
-                width="440"
-                height="445"
-                class="w-full h-[240px] lg:w-[440px] lg:h-[445px] object-cover rounded-[20px] block shadow-[0px_30px_70px_0px_rgba(0,0,0,0.45)]"
-            >
+            <picture>
+                <source srcset="<?php echo esc_url( get_template_directory_uri() . '/assets/images/banner-tiramisu.webp' ); ?>" type="image/webp">
+                <img
+                    src="<?php echo esc_url( get_template_directory_uri() . '/assets/images/banner-tiramisu.png' ); ?>"
+                    alt="Grahamisu tiramisu cake"
+                    width="440"
+                    height="445"
+                    class="w-full h-[240px] lg:w-[440px] lg:h-[445px] object-cover rounded-[20px] block shadow-[0px_30px_70px_0px_rgba(0,0,0,0.45)]"
+                >
+            </picture>
             <div class="hidden lg:block absolute bottom-[10px] -left-[28px] bg-white rounded-[16px] shadow-[0px_14px_17px_rgba(0,0,0,0.3)] px-5 py-[13px] min-w-[183px]">
                 <p class="font-primary font-normal text-[22px] leading-[22px] text-rust m-0">₱79</p>
                 <p class="font-['Lato',sans-serif] font-bold text-[11px] text-muted tracking-[1.54px] uppercase m-0 mt-[6px]">Solo tub · 250 ml</p>
