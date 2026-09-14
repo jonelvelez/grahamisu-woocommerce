@@ -274,4 +274,150 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }());
 
+    // ── Gallery page: lightbox ───────────────────────────────────
+    (function initGalleryLightbox() {
+        var cards = document.querySelectorAll('.gc-gallery__card');
+        if (!cards.length) return;
+
+        // Build lightbox DOM
+        var lb = document.createElement('div');
+        lb.id  = 'gc-lightbox';
+        lb.setAttribute('role', 'dialog');
+        lb.setAttribute('aria-modal', 'true');
+        lb.setAttribute('aria-label', 'Photo viewer');
+        lb.innerHTML =
+            '<div class="gc-lightbox__backdrop"></div>' +
+            '<button class="gc-lightbox__close" aria-label="Close">' +
+                '<svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L17 17M17 1L1 17" stroke="white" stroke-width="1.8" stroke-linecap="round"/></svg>' +
+            '</button>' +
+            '<button class="gc-lightbox__prev" aria-label="Previous photo">' +
+                '<svg width="10" height="18" viewBox="0 0 10 18" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 1L1 9L9 17" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
+            '</button>' +
+            '<div class="gc-lightbox__inner">' +
+                '<img class="gc-lightbox__img" id="gc-lb-img" alt="">' +
+                '<div class="gc-lightbox__meta">' +
+                    '<span class="gc-lightbox__label" id="gc-lb-label"></span>' +
+                    '<p class="gc-lightbox__title" id="gc-lb-title"></p>' +
+                '</div>' +
+            '</div>' +
+            '<button class="gc-lightbox__next" aria-label="Next photo">' +
+                '<svg width="10" height="18" viewBox="0 0 10 18" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L9 9L1 17" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
+            '</button>' +
+            '<span class="gc-lightbox__counter" id="gc-lb-counter"></span>';
+        document.body.appendChild(lb);
+
+        var current = 0;
+
+        function getVisible() {
+            return Array.from(cards).filter(function (c) {
+                return c.style.display !== 'none';
+            });
+        }
+
+        function show(index) {
+            var visible = getVisible();
+            if (!visible.length) return;
+            current = (index + visible.length) % visible.length;
+            var card  = visible[current];
+            var img   = document.getElementById('gc-lb-img');
+            img.src   = card.dataset.img || '';
+            img.alt   = card.dataset.title || '';
+            document.getElementById('gc-lb-label').textContent   = card.dataset.label || '';
+            document.getElementById('gc-lb-title').textContent   = card.dataset.title || '';
+            document.getElementById('gc-lb-counter').textContent = (current + 1) + ' / ' + visible.length;
+            var hasPrev = visible.length > 1;
+            lb.querySelector('.gc-lightbox__prev').style.display = hasPrev ? '' : 'none';
+            lb.querySelector('.gc-lightbox__next').style.display = hasPrev ? '' : 'none';
+        }
+
+        function open(index) {
+            show(index);
+            lb.classList.add('is-open');
+            document.body.style.overflow = 'hidden';
+            lb.querySelector('.gc-lightbox__close').focus();
+        }
+
+        function close() {
+            lb.classList.remove('is-open');
+            document.body.style.overflow = '';
+        }
+
+        function nav(dir) {
+            show(current + dir);
+        }
+
+        // Open on card click or Enter/Space
+        cards.forEach(function (card) {
+            card.addEventListener('click', function () {
+                var visible  = getVisible();
+                var visIndex = visible.indexOf(card);
+                if (visIndex !== -1) open(visIndex);
+            });
+            card.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    card.click();
+                }
+            });
+        });
+
+        lb.querySelector('.gc-lightbox__close').addEventListener('click', close);
+        lb.querySelector('.gc-lightbox__backdrop').addEventListener('click', close);
+        lb.querySelector('.gc-lightbox__prev').addEventListener('click', function () { nav(-1); });
+        lb.querySelector('.gc-lightbox__next').addEventListener('click', function () { nav(1); });
+
+        document.addEventListener('keydown', function (e) {
+            if (!lb.classList.contains('is-open')) return;
+            if (e.key === 'Escape')     close();
+            if (e.key === 'ArrowLeft')  nav(-1);
+            if (e.key === 'ArrowRight') nav(1);
+        });
+
+        // Touch swipe support
+        var touchStartX = 0;
+        lb.addEventListener('touchstart', function (e) { touchStartX = e.touches[0].clientX; }, { passive: true });
+        lb.addEventListener('touchend', function (e) {
+            var dx = e.changedTouches[0].clientX - touchStartX;
+            if (Math.abs(dx) > 50) nav(dx < 0 ? 1 : -1);
+        });
+    }());
+
+    // ── Gallery page: category filter ────────────────────────────
+    (function initGalleryFilter() {
+        var tabs  = document.querySelectorAll('.gc-gallery__tab');
+        var cards = document.querySelectorAll('.gc-gallery__card');
+        var count = document.querySelector('.gc-gallery__count');
+        if (!tabs.length || !cards.length) return;
+
+        function setActive(tab) {
+            tabs.forEach(function (t) {
+                var active = t === tab;
+                t.classList.toggle('is-active', active);
+                t.classList.toggle('border-rust', active);
+                t.classList.toggle('bg-rust', active);
+                t.classList.toggle('text-white', active);
+                t.classList.toggle('border-[#ded8d4]', !active);
+                t.classList.toggle('bg-white', !active);
+                t.classList.toggle('text-[#4e4e4e]', !active);
+            });
+        }
+
+        function filterCards(category) {
+            var visible = 0;
+            cards.forEach(function (card) {
+                var show = category === 'all' || card.dataset.category === category;
+                card.style.display = show ? '' : 'none';
+                if (show) visible++;
+            });
+            if (count) count.textContent = visible + (visible === 1 ? ' photo' : ' photos');
+        }
+
+        tabs.forEach(function (tab) {
+            tab.addEventListener('click', function () {
+                setActive(tab);
+                filterCards(tab.dataset.tab);
+            });
+        });
+    }());
+
 });

@@ -565,3 +565,176 @@ body.woocommerce-checkout .gc-field:focus {
     color: #ffffff;
     border-radius: 4px;
 }
+
+/* ── Gallery page ─────────────────────────────────────────────── */
+
+.gc-gallery__card {
+    cursor: pointer;
+}
+
+.gc-gallery__card img {
+    transition: transform 0.55s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    will-change: transform;
+}
+
+.gc-gallery__card:hover img {
+    transform: scale(1.07);
+}
+
+.gc-gallery__caption {
+    transition: background 0.35s ease;
+}
+
+.gc-gallery__card:hover .gc-gallery__caption {
+    background: linear-gradient(to top, rgba(44,26,14,0.95) 0%, rgba(44,26,14,0) 100%) !important;
+}
+
+.gc-gallery__caption-inner {
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    transform: translateY(6px);
+    opacity: 0.88;
+}
+
+.gc-gallery__card:hover .gc-gallery__caption-inner {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+/* ── Gallery lightbox ─────────────────────────────────────────── */
+
+#gc-lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+}
+
+#gc-lightbox.is-open {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.gc-lightbox__backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(55, 22, 19, 0.92);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+}
+
+.gc-lightbox__inner {
+    position: relative;
+    z-index: 1;
+    max-width: min(820px, 90vw);
+    width: 100%;
+    transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.3s ease;
+    transform: scale(0.94);
+    opacity: 0;
+}
+
+#gc-lightbox.is-open .gc-lightbox__inner {
+    transform: scale(1);
+    opacity: 1;
+}
+
+.gc-lightbox__img {
+    width: 100%;
+    max-height: 72vh;
+    object-fit: contain;
+    border-radius: 16px;
+    display: block;
+}
+
+.gc-lightbox__meta {
+    margin-top: 18px;
+    padding: 0 4px;
+}
+
+.gc-lightbox__label {
+    display: block;
+    font-family: 'Lato', sans-serif;
+    font-weight: 700;
+    font-size: 10px;
+    color: #f2b705;
+    letter-spacing: 1.8px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+}
+
+.gc-lightbox__title {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    color: #fff;
+    margin: 0;
+    line-height: 1.3;
+}
+
+.gc-lightbox__close {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 2;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.18);
+    border-radius: 50%;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #fff;
+    font-size: 22px;
+    line-height: 1;
+    transition: background 0.2s ease;
+}
+
+.gc-lightbox__close:hover {
+    background: rgba(255,255,255,0.22);
+}
+
+.gc-lightbox__prev,
+.gc-lightbox__next {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 2;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.18);
+    border-radius: 50%;
+    width: 52px;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #fff;
+    transition: background 0.2s ease;
+}
+
+.gc-lightbox__prev:hover,
+.gc-lightbox__next:hover {
+    background: rgba(255,255,255,0.22);
+}
+
+.gc-lightbox__prev { left: 20px; }
+.gc-lightbox__next { right: 20px; }
+
+.gc-lightbox__counter {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'Lato', sans-serif;
+    font-size: 11px;
+    color: rgba(255,255,255,0.45);
+    letter-spacing: 1.2px;
+    z-index: 2;
+    white-space: nowrap;
+}

@@ -17,7 +17,7 @@ $shop_url = function_exists( 'wc_get_page_id' )
                     Layers of coffee, cream and<br class="hidden lg:block"> pure indulgence
                 </h2>
             </div>
-            <a href="<?php echo esc_url( $shop_url ); ?>"
+            <a href="/gallery"
                class="font-['Lato',sans-serif] font-normal text-[12px] tracking-[2.04px] text-brown underline uppercase whitespace-nowrap decoration-brown hover:text-[#2c1a0e] hover:decoration-[#2c1a0e] hidden lg:block">
                 View all →
             </a>
