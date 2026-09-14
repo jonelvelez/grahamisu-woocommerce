@@ -332,6 +332,15 @@ body.single-product .sp .single_add_to_cart_button.disabled {
     display: block;
 }
 
+/* Override base `img { height: auto }` — ensures shop card product photo fills the image area */
+.gc-product-img-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top;
+    display: block;
+}
+
 .sp__thumb.is-active {
     border: 2px solid #6c290f;
 }

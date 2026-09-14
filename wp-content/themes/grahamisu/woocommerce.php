@@ -98,10 +98,10 @@ get_header();
                 <div class="flex flex-col bg-white border border-[#e7e1dd] rounded-[18px] overflow-hidden group transition-[transform,box-shadow,border-color] duration-[220ms] ease-out hover:-translate-y-[6px] hover:shadow-[0_24px_48px_rgba(55,22,19,.16)] hover:border-[#b8542c]">
 
                     <!-- Image -->
-                    <a href="<?php echo esc_url( $url ); ?>" class="block relative overflow-hidden" style="height:240px">
+                    <a href="<?php echo esc_url( $url ); ?>" class="gc-product-img-wrap block relative overflow-hidden" style="height:240px">
                         <img src="<?php echo esc_url( $img_src ); ?>"
                              alt="<?php echo esc_attr( $name ); ?>"
-                             class="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-[1.03]">
+                             class="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-[1.03]">
                         <!-- Badges overlay -->
                         <div class="absolute left-[14px] right-[14px] top-[14px] flex flex-wrap items-start justify-between gap-2">
                             <?php if ( $badge ) : ?>
