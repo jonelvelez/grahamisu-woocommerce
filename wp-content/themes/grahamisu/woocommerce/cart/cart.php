@@ -24,20 +24,20 @@ do_action( 'woocommerce_before_cart' );
     </div>
 
     <!-- ── Two-column layout ── -->
-    <div class="flex flex-col lg:flex-row items-start gap-8 lg:gap-10">
+    <div class="flex flex-col xl:flex-row items-start gap-8 xl:gap-10">
 
         <!-- ── Left: cart items + notes ── -->
         <div class="flex-1 min-w-0 w-full">
 
             <!-- Column labels -->
-            <div class="hidden lg:flex items-center pb-3 border-b border-[#d8d2ce] mb-4 px-6">
+            <div class="hidden xl:flex items-center pb-3 border-b border-[#d8d2ce] mb-4 px-6">
                 <div class="flex-1 font-['Lato',sans-serif] font-bold text-[11px] text-[#838383] tracking-[1.98px] uppercase">
                     <?php esc_html_e( 'Product', 'grahamisu' ); ?>
                 </div>
                 <div class="w-[150px] text-center font-['Lato',sans-serif] font-bold text-[11px] text-[#838383] tracking-[1.98px] uppercase">
                     <?php esc_html_e( 'Quantity', 'grahamisu' ); ?>
                 </div>
-                <div class="w-[80px] text-right font-['Lato',sans-serif] font-bold text-[11px] text-[#838383] tracking-[1.98px] uppercase">
+                <div class="hidden xl:block w-[80px] text-right font-['Lato',sans-serif] font-bold text-[11px] text-[#838383] tracking-[1.98px] uppercase">
                     <?php esc_html_e( 'Total', 'grahamisu' ); ?>
                 </div>
                 <div class="w-6 ml-4"></div>
@@ -82,74 +82,84 @@ do_action( 'woocommerce_before_cart' );
                         <?php endif; ?>
                     </div>
 
-                    <!-- Product info -->
-                    <div class="flex-1 min-w-0 flex flex-col gap-1">
-                        <?php if ( $product_permalink ) : ?>
-                            <a href="<?php echo esc_url( $product_permalink ); ?>"
-                               class="font-primary font-semibold text-[18px] lg:text-[20px] text-[#2c1a0e] no-underline leading-none hover:text-rust transition-colors">
-                                <?php echo esc_html( $product->get_name() ); ?>
-                            </a>
-                        <?php else : ?>
-                            <span class="font-primary font-semibold text-[18px] lg:text-[20px] text-[#2c1a0e] leading-none">
-                                <?php echo esc_html( $product->get_name() ); ?>
+                    <!-- Right-side wrapper: column on mobile, row on desktop -->
+                    <div class="flex-1 min-w-0 flex flex-col lg:flex-row lg:items-center gap-2 lg:gap-4">
+
+                        <!-- Product info -->
+                        <div class="flex-1 min-w-0 flex flex-col gap-1">
+                            <?php if ( $product_permalink ) : ?>
+                                <a href="<?php echo esc_url( $product_permalink ); ?>"
+                                   class="font-primary font-semibold text-[18px] lg:text-[20px] text-[#2c1a0e] no-underline leading-snug hover:text-rust transition-colors">
+                                    <?php echo esc_html( $product->get_name() ); ?>
+                                </a>
+                            <?php else : ?>
+                                <span class="font-primary font-semibold text-[18px] lg:text-[20px] text-[#2c1a0e] leading-snug">
+                                    <?php echo esc_html( $product->get_name() ); ?>
+                                </span>
+                            <?php endif; ?>
+
+                            <?php if ( $size_attr ) : ?>
+                            <span class="font-['Lato',sans-serif] font-normal text-[12px] text-[#838383] tracking-[1.44px] uppercase leading-none">
+                                Size: <?php echo esc_html( $size_attr ); ?>
                             </span>
-                        <?php endif; ?>
+                            <?php endif; ?>
 
-                        <?php if ( $size_attr ) : ?>
-                        <span class="font-['Lato',sans-serif] font-normal text-[12px] text-[#838383] tracking-[1.44px] uppercase leading-none">
-                            Size: <?php echo esc_html( $size_attr ); ?>
-                        </span>
-                        <?php endif; ?>
+                            <span class="font-['Lato',sans-serif] font-normal text-[14px] text-rust leading-none">
+                                <?php echo wc_price( $price_raw ); // phpcs:ignore ?> each
+                            </span>
+                        </div>
 
-                        <span class="font-['Lato',sans-serif] font-normal text-[14px] text-rust leading-none">
-                            <?php echo wc_price( $price_raw ); // phpcs:ignore ?> each
-                        </span>
-                    </div>
+                        <!-- Controls row: qty + total (desktop) + remove -->
+                        <div class="flex items-center gap-3 lg:gap-4 lg:shrink-0">
 
-                    <!-- Qty stepper -->
-                    <div class="gc-cart-item__qty-col shrink-0">
-                        <?php
-                        echo apply_filters( // phpcs:ignore
-                            'woocommerce_cart_item_quantity',
-                            woocommerce_quantity_input(
-                                [
-                                    'input_name'   => "cart[{$cart_item_key}][qty]",
-                                    'input_value'  => $cart_item['quantity'],
-                                    'max_value'    => $max_qty,
-                                    'min_value'    => 0,
-                                    'product_name' => $product_name,
-                                    'cart_context' => true,
-                                ],
-                                $product,
-                                false
-                            ),
-                            $cart_item_key,
-                            $cart_item
-                        );
-                        ?>
-                    </div>
+                            <!-- Qty stepper -->
+                            <div class="gc-cart-item__qty-col shrink-0">
+                                <?php
+                                echo apply_filters( // phpcs:ignore
+                                    'woocommerce_cart_item_quantity',
+                                    woocommerce_quantity_input(
+                                        [
+                                            'input_name'   => "cart[{$cart_item_key}][qty]",
+                                            'input_value'  => $cart_item['quantity'],
+                                            'max_value'    => $max_qty,
+                                            'min_value'    => 0,
+                                            'product_name' => $product_name,
+                                            'cart_context' => true,
+                                        ],
+                                        $product,
+                                        false
+                                    ),
+                                    $cart_item_key,
+                                    $cart_item
+                                );
+                                ?>
+                            </div>
 
-                    <!-- Line total -->
-                    <div class="hidden lg:block w-[80px] text-right font-['Lato',sans-serif] font-bold text-[19px] text-[#2c1a0e] leading-none shrink-0 [&_.woocommerce-Price-amount]:text-inherit [&_.woocommerce-Price-currencySymbol]:text-inherit">
-                        <?php echo $subtotal_html; // phpcs:ignore ?>
-                    </div>
+                            <!-- Line total (wide desktop only) -->
+                            <div class="hidden xl:block w-[80px] text-right font-['Lato',sans-serif] font-bold text-[19px] text-[#2c1a0e] leading-none shrink-0 [&_.woocommerce-Price-amount]:text-inherit [&_.woocommerce-Price-currencySymbol]:text-inherit">
+                                <?php echo $subtotal_html; // phpcs:ignore ?>
+                            </div>
 
-                    <!-- Remove -->
-                    <div class="shrink-0 w-5 ml-1 flex items-center justify-center">
-                        <?php
-                        echo apply_filters( // phpcs:ignore
-                            'woocommerce_cart_item_remove_link',
-                            sprintf(
-                                '<a href="%s" class="gc-cart-item__remove font-[\'Lato\',sans-serif] text-[17px] text-[#a9a29c] leading-none no-underline transition-colors hover:text-rust" aria-label="%s" data-product_id="%s" data-product_sku="%s">×</a>',
-                                esc_url( wc_get_cart_remove_url( $cart_item_key ) ),
-                                esc_attr( sprintf( __( 'Remove %s from cart', 'woocommerce' ), wp_strip_all_tags( $product_name ) ) ),
-                                esc_attr( $product_id ),
-                                esc_attr( $product->get_sku() )
-                            ),
-                            $cart_item_key
-                        );
-                        ?>
-                    </div>
+                            <!-- Remove -->
+                            <div class="shrink-0 w-5 ml-auto lg:ml-0 flex items-center justify-center">
+                                <?php
+                                echo apply_filters( // phpcs:ignore
+                                    'woocommerce_cart_item_remove_link',
+                                    sprintf(
+                                        '<a href="%s" class="gc-cart-item__remove font-[\'Lato\',sans-serif] text-[17px] text-[#a9a29c] leading-none no-underline transition-colors hover:text-rust" aria-label="%s" data-product_id="%s" data-product_sku="%s">×</a>',
+                                        esc_url( wc_get_cart_remove_url( $cart_item_key ) ),
+                                        esc_attr( sprintf( __( 'Remove %s from cart', 'woocommerce' ), wp_strip_all_tags( $product_name ) ) ),
+                                        esc_attr( $product_id ),
+                                        esc_attr( $product->get_sku() )
+                                    ),
+                                    $cart_item_key
+                                );
+                                ?>
+                            </div>
+
+                        </div><!-- /controls row -->
+
+                    </div><!-- /right-side wrapper -->
 
                 </div>
                 <?php endforeach; ?>
@@ -175,13 +185,13 @@ do_action( 'woocommerce_before_cart' );
                 </label>
                 <textarea id="gc-order-notes" name="gc_order_notes" rows="4"
                           placeholder="<?php esc_attr_e( 'Greeting on the box, gate instructions, anything at all…', 'grahamisu' ); ?>"
-                          class="w-full lg:max-w-[520px] h-[112px] bg-white border border-rust rounded-[12px] resize-none font-['Lato',sans-serif] font-normal text-[15px] text-[#4e4e4e] placeholder-[#a9a29c] p-[18px] box-border outline-none overflow-auto"></textarea>
+                          class="w-full xl:max-w-[520px] h-[112px] bg-white border border-rust rounded-[12px] resize-none font-['Lato',sans-serif] font-normal text-[15px] text-[#4e4e4e] placeholder-[#a9a29c] p-[18px] box-border outline-none overflow-auto"></textarea>
             </div>
 
         </div>
 
         <!-- ── Right: Order summary card ── -->
-        <div class="w-full lg:w-[380px] lg:shrink-0 bg-white border border-[#e7e1dd] rounded-[20px] p-7">
+        <div class="w-full xl:w-[380px] xl:shrink-0 bg-white border border-[#e7e1dd] rounded-[20px] p-7">
 
             <!-- Title -->
             <h2 class="font-primary font-normal text-[24px] text-[#2c1a0e] leading-none m-0 mb-[34px]">
