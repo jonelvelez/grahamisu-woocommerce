@@ -472,6 +472,51 @@ function grahamisu_validate_delivery_address( array $data, WP_Error $errors ) {
     }
 }
 
+// ── Security Hardening ────────────────────────────────────────────────────────
+
+// 1. Hide /wp-json/wp/v2/users — prevents username enumeration via REST API
+add_filter( 'rest_endpoints', function( $endpoints ) {
+    if ( ! is_user_logged_in() ) {
+        unset( $endpoints['/wp/v2/users'] );
+        unset( $endpoints['/wp/v2/users/(?P<id>[\d]+)'] );
+    }
+    return $endpoints;
+} );
+
+// 2. Block author enumeration via /?author=1 redirects
+add_action( 'template_redirect', function() {
+    if ( ! is_admin() && isset( $_GET['author'] ) && ! is_user_logged_in() ) {
+        wp_redirect( home_url( '/' ), 301 );
+        exit;
+    }
+} );
+
+// 3. Remove WordPress version from <head> and all feeds
+remove_action( 'wp_head', 'wp_generator' );
+add_filter( 'the_generator', '__return_empty_string' );
+
+// 4. Strip ?ver= query strings from enqueued scripts and styles
+add_filter( 'style_loader_src',  'grahamisu_strip_ver_query', 9999 );
+add_filter( 'script_loader_src', 'grahamisu_strip_ver_query', 9999 );
+function grahamisu_strip_ver_query( $src ) {
+    return strpos( $src, 'ver=' ) ? remove_query_arg( 'ver', $src ) : $src;
+}
+
+// 5. Disable XML-RPC — not used by this store; common brute-force target
+add_filter( 'xmlrpc_enabled', '__return_false' );
+remove_action( 'wp_head', 'rsd_link' );
+remove_action( 'wp_head', 'wlwmanifest_link' );
+
+// 6. Send 403 for readme.html and license.txt (expose WP version)
+add_action( 'init', function() {
+    $uri = $_SERVER['REQUEST_URI'] ?? '';
+    if ( preg_match( '#/(readme\.html|license\.txt)$#i', $uri ) ) {
+        status_header( 403 );
+        nocache_headers();
+        exit;
+    }
+} );
+
 // ── Checkout: AJAX shipping method update ─────────────────────────────────────
 // Updates the WC session's chosen shipping method and returns fresh totals.
 // Called by JS when the customer switches between Pickup and Delivery tabs.
