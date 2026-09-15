@@ -115,7 +115,7 @@ $order_total = WC()->cart->get_total( 'edit' );
                         <span><?php esc_html_e( 'Pickup in store', 'grahamisu' ); ?></span>
                     </button>
                     <button type="button"
-                            class="gc-fulfillment__tab is-active flex flex-row items-center justify-center gap-3 rounded-[12px] h-[58px] px-5 border border-rust cursor-pointer font-['Lato',sans-serif] font-normal text-[13px] text-white bg-transparent transition-colors"
+                            class="gc-fulfillment__tab is-active flex flex-row items-center justify-center gap-3 rounded-[12px] h-[58px] px-5 border border-rust cursor-pointer font-['Lato',sans-serif] font-normal text-[13px] text-[#2c1a0e] bg-white transition-colors"
                             data-tab="delivery"
                             data-shipping-method="<?php echo esc_attr( $delivery_rate_id ); ?>"
                             aria-pressed="true">
@@ -226,7 +226,9 @@ $order_total = WC()->cart->get_total( 'edit' );
                 <div class="bg-white border border-rust rounded-[12px] overflow-hidden">
                     <!-- Header row -->
                     <div class="flex items-center gap-3 px-5 h-[55px] bg-[#fdf8f6] border-b border-[#e7e1dd]">
-                        <span class="shrink-0 w-4 h-4 rounded-[4px] border-[4px] border-rust bg-white flex items-center justify-center"></span>
+                        <span class="shrink-0 w-[18px] h-[18px] rounded-full border-2 border-rust bg-white flex items-center justify-center">
+                            <span class="w-[9px] h-[9px] rounded-full bg-rust"></span>
+                        </span>
                         <span class="font-['Lato',sans-serif] font-bold text-[15px] text-[#2c1a0e] flex-1">
                             <?php
                             echo $first_gw

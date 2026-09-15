@@ -215,6 +215,16 @@ body.woocommerce-cart .woocommerce-notices-wrapper {
     color: #ffffff;
 }
 
+/* ── Gallery filter: keep active tab text visible on hover ──
+   Inactive tabs carry a hardcoded `hover:text-rust` utility that stays on the
+   button after it becomes active, turning the text rust-on-rust (invisible).
+   Force white text + a subtle darker rust for hover feedback. */
+.gc-gallery__tab.is-active:hover {
+    color: #ffffff;
+    background-color: #7d3316;
+    border-color: #7d3316;
+}
+
 /* ── Cart: subtotal / price HTML inside summary card ── */
 .woocommerce-cart .woocommerce-Price-amount {
     font-family: inherit;
@@ -583,6 +593,27 @@ body.woocommerce-checkout .gc-field:focus {
     border-radius: 4px;
 }
 
+/* Past dates — not selectable */
+.gc-cal__day:disabled,
+.gc-cal__day.is-disabled {
+    color: #c9c2bd;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.gc-cal__day:disabled:hover,
+.gc-cal__day.is-disabled:hover {
+    background: none;
+}
+
+/* Disabled prev-month nav (viewing the current month) */
+.gc-cal__nav:disabled,
+.gc-cal__nav.is-disabled {
+    color: #cfc8c3;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
 /* ── Gallery page ─────────────────────────────────────────────── */
 
 .gc-gallery__card {
@@ -754,4 +785,155 @@ body.woocommerce-checkout .gc-field:focus {
     letter-spacing: 1.2px;
     z-index: 2;
     white-space: nowrap;
+}
+
+/* ── Add-to-cart toast notification ── */
+.gc-toast {
+    position: fixed;
+    bottom: 32px;
+    right: 32px;
+    z-index: 99999;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: #371613;
+    color: #fdf2ec;
+    border-radius: 14px;
+    padding: 18px 22px;
+    box-shadow: 0 8px 32px rgba(55,22,19,0.22);
+    min-width: 280px;
+    max-width: 360px;
+    transform: translateY(0);
+    opacity: 1;
+    transition: opacity 0.35s ease, transform 0.35s ease;
+    pointer-events: auto;
+}
+
+.gc-toast.is-hidden {
+    opacity: 0;
+    transform: translateY(16px);
+    pointer-events: none;
+}
+
+.gc-toast__icon {
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    background: rgba(200,165,106,0.18);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.gc-toast__icon svg {
+    display: block;
+}
+
+.gc-toast__body {
+    flex: 1;
+    min-width: 0;
+}
+
+.gc-toast__title {
+    font-family: 'Playfair Display', serif;
+    font-size: 16px;
+    font-weight: 600;
+    color: #fdf2ec;
+    line-height: 1.2;
+    display: block;
+}
+
+.gc-toast__sub {
+    font-family: 'Lato', sans-serif;
+    font-size: 12px;
+    color: rgba(253,242,236,0.6);
+    margin-top: 3px;
+    display: block;
+}
+
+.gc-toast__cta {
+    font-family: 'Lato', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #c8a56a;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: opacity 0.2s;
+}
+
+.gc-toast__cta:hover {
+    opacity: 0.75;
+    color: #c8a56a;
+}
+
+.gc-toast__close {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    color: rgba(253,242,236,0.45);
+    flex-shrink: 0;
+    line-height: 1;
+    transition: color 0.2s;
+}
+
+.gc-toast__close:hover {
+    color: #fdf2ec;
+}
+
+@media (max-width: 480px) {
+    .gc-toast {
+        bottom: 16px;
+        right: 16px;
+        left: 16px;
+        min-width: 0;
+    }
+}
+
+/* Hide WooCommerce's inline "View cart" link injected after AJAX add — the
+   branded toast already provides a "View Cart" action, so this is redundant. */
+.woocommerce-page a.added_to_cart {
+    display: none !important;
+}
+
+/* ── Branded loading overlay (WooCommerce blockUI) ──
+   Replaces WC's default gray spinner shown on Place Order / cart updates with a
+   soft cream overlay and a clean rust ring spinner. blockUI sets inline styles,
+   so !important is required to override them. */
+.blockUI.blockOverlay {
+    background-color: #fdf2ec !important;
+    opacity: 0.7 !important;
+}
+
+/* Place Order: expand the checkout form's block overlay to cover the whole
+   viewport (blockUI positions it absolutely inside form.checkout by default).
+   Scoped to the form's direct child so cart / review updates stay in-place. */
+form.checkout > .blockUI.blockOverlay {
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    z-index: 999999 !important;
+}
+
+.blockUI.blockOverlay::before {
+    content: "" !important;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 46px !important;
+    height: 46px !important;
+    margin: -23px 0 0 -23px !important;
+    background: none !important;
+    border: 3px solid rgba(108, 41, 15, 0.18) !important;
+    border-top-color: #6c290f !important;
+    border-radius: 50% !important;
+    animation: gc-spin 0.7s linear infinite !important;
+}
+
+@keyframes gc-spin {
+    to { transform: rotate(360deg); }
 }

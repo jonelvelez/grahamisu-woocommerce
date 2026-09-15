@@ -134,12 +134,28 @@ get_header();
                         </div>
                         <div class="flex-1"></div>
                         <!-- Footer: price + add -->
+                        <?php
+                        // Build WooCommerce AJAX add-to-cart classes so wc-add-to-cart.js
+                        // binds AJAX (no page reload) and fires the `added_to_cart` event
+                        // that our toast listens for (see main.js showCartToast).
+                        $can_atc     = $product->is_purchasable() && $product->is_in_stock();
+                        $is_ajax_atc = $can_atc && $product->supports( 'ajax_add_to_cart' );
+                        $atc_classes = trim(
+                            ( $can_atc ? 'add_to_cart_button ' : '' ) .
+                            ( $is_ajax_atc ? 'ajax_add_to_cart ' : '' ) .
+                            'product_type_' . $product->get_type()
+                        );
+                        ?>
                         <div class="flex flex-wrap items-center justify-between gap-3 mt-4 pt-4 border-t border-[#efeae7]">
                             <span class="font-primary text-[24px] text-rust leading-none">
                                 <?php echo wp_kses_post( wc_price( $product->get_price() ) ); ?>
                             </span>
                             <a href="<?php echo $atc_url; ?>"
-                               class="px-[18px] py-[11px] rounded-[100px] border-[1.5px] border-rust text-rust font-['Lato',sans-serif] font-bold text-[11px] tracking-[.12em] uppercase no-underline shrink-0 leading-none transition-colors hover:bg-rust hover:text-white">
+                               data-quantity="1"
+                               data-product_id="<?php echo esc_attr( $product->get_id() ); ?>"
+                               data-product-name="<?php echo esc_attr( $name ); ?>"
+                               rel="nofollow"
+                               class="<?php echo esc_attr( $atc_classes ); ?> px-[18px] py-[11px] rounded-[100px] border-[1.5px] border-rust text-rust font-['Lato',sans-serif] font-bold text-[11px] tracking-[.12em] uppercase no-underline shrink-0 leading-none transition-colors hover:bg-rust hover:text-white">
                                 <?php echo esc_html( $product->add_to_cart_text() ); ?>
                             </a>
                         </div>

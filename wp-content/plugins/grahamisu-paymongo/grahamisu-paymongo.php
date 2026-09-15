@@ -263,7 +263,10 @@ add_action( 'plugins_loaded', function () {
 			$order->update_status( 'pending', 'Awaiting PayMongo payment.' );
 			$order->save();
 
-			WC()->cart->empty_cart();
+			// NOTE: the cart is intentionally NOT emptied here. If the customer
+			// backs out of PayMongo or the payment fails, their cart is preserved
+			// so they can retry checkout without re-adding items. The cart is
+			// emptied only after the payment is confirmed in handle_return().
 
 			return [
 				'result'   => 'success',
@@ -289,6 +292,9 @@ add_action( 'plugins_loaded', function () {
 
 			// If order is already paid (e.g. double redirect), go straight to thank-you.
 			if ( $order->is_paid() ) {
+				if ( WC()->cart ) {
+					WC()->cart->empty_cart();
+				}
 				wp_safe_redirect( $order->get_checkout_order_received_url() );
 				exit;
 			}
@@ -302,6 +308,9 @@ add_action( 'plugins_loaded', function () {
 					$payment_id = $response['data']['attributes']['payment_intent']['id'] ?? '';
 					$order->payment_complete( $payment_id );
 					$order->add_order_note( 'PayMongo payment confirmed.' );
+					if ( WC()->cart ) {
+						WC()->cart->empty_cart();
+					}
 					wp_safe_redirect( $order->get_checkout_order_received_url() );
 					exit;
 				}

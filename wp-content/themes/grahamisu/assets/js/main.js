@@ -139,6 +139,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 var m = view.getMonth();
                 var daysInMonth = new Date(y, m + 1, 0).getDate();
 
+                // Disable past dates: anything before today is not selectable.
+                var today = new Date();
+                today.setHours(0, 0, 0, 0);
+                var canGoPrev = ( y > today.getFullYear() ) ||
+                                ( y === today.getFullYear() && m > today.getMonth() );
+
                 // First weekday of month (Mon=0 … Sun=6)
                 var firstDay = new Date(y, m, 1).getDay();
                 firstDay = firstDay === 0 ? 6 : firstDay - 1;
@@ -147,7 +153,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 // Header
                 h += '<div class="gc-cal__header">';
-                h += '<button class="gc-cal__nav gc-cal__prev" type="button" aria-label="Previous month">';
+                h += '<button class="gc-cal__nav gc-cal__prev' + ( canGoPrev ? '' : ' is-disabled' ) + '" type="button" aria-label="Previous month"' + ( canGoPrev ? '' : ' disabled' ) + '>';
                 h += '<svg width="8" height="13" viewBox="0 0 8 13" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7 1L1 6.5L7 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
                 h += '</button>';
                 h += '<span class="gc-cal__month">' + MONTHS[m] + ' ' + y + '</span>';
@@ -170,8 +176,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 for (var day = 1; day <= daysInMonth; day++) {
                     var ds = y + '-' + pad(m + 1) + '-' + pad(day);
-                    var cls = 'gc-cal__day' + (ds === selectedDate ? ' is-selected' : '');
-                    h += '<button class="' + cls + '" type="button" data-date="' + ds + '">' + day + '</button>';
+                    var isPast = new Date(y, m, day) < today;
+                    var cls = 'gc-cal__day'
+                        + (ds === selectedDate ? ' is-selected' : '')
+                        + (isPast ? ' is-disabled' : '');
+                    h += '<button class="' + cls + '" type="button" data-date="' + ds + '"'
+                        + (isPast ? ' disabled' : '') + '>' + day + '</button>';
                 }
 
                 h += '</div>';
@@ -380,6 +390,96 @@ document.addEventListener('DOMContentLoaded', function () {
             var dx = e.changedTouches[0].clientX - touchStartX;
             if (Math.abs(dx) > 50) nav(dx < 0 ? 1 : -1);
         });
+    }());
+
+    // ── Add-to-cart toast notification ───────────────────────────
+    var cartUrl = (typeof wc_add_to_cart_params !== 'undefined' && wc_add_to_cart_params.cart_url)
+        ? wc_add_to_cart_params.cart_url
+        : '/cart';
+
+    function showCartToast(productName) {
+        var existing = document.querySelector('.gc-toast');
+        if (existing) {
+            existing.remove();
+        }
+
+        var subText = productName
+            ? '“' + productName + '” added to your bag.'
+            : 'Item successfully added to your bag.';
+
+        var toast = document.createElement('div');
+        toast.className = 'gc-toast is-hidden';
+        toast.setAttribute('role', 'status');
+        toast.setAttribute('aria-live', 'polite');
+        toast.innerHTML =
+            '<div class="gc-toast__icon">' +
+                '<svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">' +
+                    '<path d="M3 9L7.5 13.5L15 5" stroke="#c8a56a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>' +
+                '</svg>' +
+            '</div>' +
+            '<div class="gc-toast__body">' +
+                '<span class="gc-toast__title">Added to cart!</span>' +
+                '<span class="gc-toast__sub">' + subText + '</span>' +
+            '</div>' +
+            '<a href="' + cartUrl + '" class="gc-toast__cta">View Cart</a>' +
+            '<button class="gc-toast__close" type="button" aria-label="Dismiss">' +
+                '<svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">' +
+                    '<path d="M1 1L11 11M11 1L1 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>' +
+                '</svg>' +
+            '</button>';
+        document.body.appendChild(toast);
+
+        var timer;
+        function dismiss() {
+            clearTimeout(timer);
+            toast.classList.add('is-hidden');
+            setTimeout(function () { if (toast.parentNode) toast.remove(); }, 400);
+        }
+
+        toast.querySelector('.gc-toast__close').addEventListener('click', dismiss);
+        toast.addEventListener('mouseenter', function () { clearTimeout(timer); });
+        toast.addEventListener('mouseleave', function () { timer = setTimeout(dismiss, 2500); });
+
+        requestAnimationFrame(function () {
+            requestAnimationFrame(function () {
+                toast.classList.remove('is-hidden');
+            });
+        });
+
+        timer = setTimeout(dismiss, 5000);
+    }
+
+    // Shop page: listen to WooCommerce AJAX added_to_cart event
+    (function initShopCartToast() {
+        if (typeof window.jQuery === 'undefined') return;
+        window.jQuery(document.body).on('added_to_cart', function (e, fragments, cartHash, $button) {
+            var productName = '';
+            if ($button && $button.length) {
+                productName = ($button.attr('data-product-name') || '').trim();
+                if (!productName) {
+                    var $card = $button.closest('li.product');
+                    if ($card.length) {
+                        productName = $card.find('.woocommerce-loop-product__title').text().trim();
+                    }
+                }
+            }
+            showCartToast(productName);
+        });
+    }());
+
+    // Single product page: detect redirect URL param after form submit
+    (function initSingleProductToast() {
+        var params = new URLSearchParams(window.location.search);
+        if (!params.has('added-to-cart')) return;
+
+        params.delete('added-to-cart');
+        var qs = params.toString();
+        var cleanUrl = window.location.pathname + (qs ? '?' + qs : '');
+        window.history.replaceState(null, '', cleanUrl);
+
+        var title = document.querySelector('h1.sp__title, h1.product_title');
+        var productName = title ? title.textContent.trim() : '';
+        showCartToast(productName);
     }());
 
     // ── Gallery page: category filter ────────────────────────────

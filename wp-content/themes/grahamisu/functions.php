@@ -7,9 +7,18 @@ add_filter( 'woocommerce_add_to_cart_fragments', 'grahamisu_cart_count_fragment'
 function grahamisu_cart_count_fragment( $fragments ) {
     $count   = WC()->cart->get_cart_contents_count();
     $content = $count > 0 ? esc_html( $count ) : '';
-    $fragments['span.cart-count'] = '<span class="cart-count">' . $content . '</span>';
+    // NOTE: keep this class list in sync with the .cart-count span in header.php.
+    // The fragment replaces the whole element, so it must carry the same styling.
+    $classes = "cart-count absolute -top-[6px] -right-[8px] bg-white text-black font-['Lato'] text-[9px] font-normal w-4 h-4 rounded-full flex items-center justify-center empty:hidden";
+    $fragments['span.cart-count'] = '<span class="' . esc_attr( $classes ) . '">' . $content . '</span>';
     return $fragments;
 }
+
+// Suppress the default WooCommerce "added to cart" notice — a custom branded
+// toast (main.js showCartToast) handles success feedback instead. Returning an
+// empty string means wc_add_notice() skips it entirely (no empty green bars),
+// which also stops the notices piling up on the cart page.
+add_filter( 'wc_add_to_cart_message_html', '__return_empty_string' );
 
 function grahamisu_assets() {
     wp_enqueue_style(
@@ -23,14 +32,14 @@ function grahamisu_assets() {
         'grahamisu-main',
         get_template_directory_uri() . '/assets/css/main.css',
         array( 'grahamisu-fonts' ),
-        '2.3.0'
+        '2.10.0'
     );
 
     wp_enqueue_script(
         'grahamisu-main',
         get_template_directory_uri() . '/assets/js/main.js',
-        array(),
-        '1.0.0',
+        array( 'jquery' ),
+        '1.3.0',
         true
     );
 }

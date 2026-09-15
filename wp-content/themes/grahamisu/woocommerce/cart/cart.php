@@ -263,7 +263,7 @@ do_action( 'woocommerce_before_cart' );
                 </button>
 
                 <button type="button"
-                        class="gc-fulfillment__tab is-active flex-1 flex flex-col items-center justify-center gap-[6px] rounded-[12px] h-[74px] border border-rust cursor-pointer font-['Lato',sans-serif] font-normal text-[12px] leading-none text-white bg-transparent transition-colors"
+                        class="gc-fulfillment__tab is-active flex-1 flex flex-col items-center justify-center gap-[6px] rounded-[12px] h-[74px] border border-rust cursor-pointer font-['Lato',sans-serif] font-normal text-[12px] leading-none text-[#2c1a0e] bg-white transition-colors"
                         data-tab="delivery">
                     <svg width="26" height="18" viewBox="0 0 30 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                         <path d="M19 3H1V14H19V3Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>

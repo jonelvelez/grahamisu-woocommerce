@@ -46,8 +46,8 @@ $shop_url = function_exists( 'wc_get_page_id' )
                 >
             </picture>
             <div class="hidden lg:block absolute bottom-[10px] -left-[28px] bg-white rounded-[16px] shadow-[0px_14px_17px_rgba(0,0,0,0.3)] px-5 py-[13px] min-w-[183px]">
-                <p class="font-primary font-normal text-[22px] leading-[22px] text-rust m-0">₱79</p>
-                <p class="font-['Lato',sans-serif] font-bold text-[11px] text-muted tracking-[1.54px] uppercase m-0 mt-[6px]">Solo tub · 250 ml</p>
+                <p class="font-primary font-normal text-[22px] leading-[22px] text-rust m-0"><span class="text-[#f2b705]">★</span> 4.9</p>
+                <p class="font-['Lato',sans-serif] font-bold text-[11px] text-muted tracking-[1.54px] uppercase m-0 mt-[6px]">Loved by 500+ customers</p>
             </div>
         </div>
 
